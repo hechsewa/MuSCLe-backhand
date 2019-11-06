@@ -1,0 +1,32 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+flask = "*"
+datetime = "*"
+sqlalchemy = "*"
+csv = "*"
+librosa = "*"
+math = "*"
+numpy = "*"
+pydub = "*"
+scipy = "*"
+os = "*"
+eyed3 = "*"
+stagger = "*"
+io = "*"
+sklearn = "*"
+re = "*"
+flask-cors = "*"
+flask-sqlalchemy = "*"
+gunicorn = "*"
+pymysql = "*"
+ffmpeg = "*"
+pandas = "*"
+
+[requires]
+python_version = "3.7"

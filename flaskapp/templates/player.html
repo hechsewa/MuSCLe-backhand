@@ -1,0 +1,27 @@
+{%  extends "layout.html" %}
+{%  block content %}
+
+    <div id="metadata">
+        <div id="song-cover"></div>
+        <div id="song-info">
+            <ul id="song-info">
+                <li>Utwór: {{ title }}</li>
+                <li>Wykonawca: {{ artist }}</li>
+                <li>Gatunek: {{ genre }}</li>
+                <li>Polecone: {{ recommended }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="audio_div"></div>
+
+    <div id="scoreBtns">
+        <button>+</button>
+        <button>-</button>
+    </div>
+
+    <div id="next">
+        <button>następny</button>
+    </div>
+
+{% endblock %}
