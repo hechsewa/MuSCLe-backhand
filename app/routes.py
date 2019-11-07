@@ -5,14 +5,7 @@ from flask import render_template, jsonify, send_file, request, json, Flask
 from .models import Grades, Metadata, Song, UserData
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-CORS(app, origins=['127.0.0.1:5000'])
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://hechsma2:AWjLUDbZaz2Srh6j@mysql.agh.edu.pl:3306/hechsma2'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://3wvzLcjQzD:RArEPgAhKS@remotemysql.com:3306/3wvzLcjQzD'
-db = SQLAlchemy(app)
+from .__init__ import app, db
 
 
 @app.route('/')
