@@ -2,7 +2,7 @@ import os
 import eyed3
 import stagger
 import io
-from backhand.app import app, models, db
+from app import app, models, db
 
 
 # Pobiera odpowiednie metadata z plikow audio

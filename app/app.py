@@ -3,7 +3,7 @@ import re
 
 import sqlalchemy
 from flask import render_template, jsonify, send_file, request, json
-from backhand.app import app, models, db
+from app import app, models, db
 
 
 # home page
