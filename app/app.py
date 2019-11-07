@@ -7,8 +7,7 @@ from app import app, models, db
 
 
 # home page
-from backhand.app.models import Grades
-from backhand.src.crossdomain import crossdomain
+from app.models import Grades
 
 
 @app.route('/')
