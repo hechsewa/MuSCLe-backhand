@@ -1,6 +1,6 @@
-from .app import app
+from .app import routes
 
-app.config['TRAP_BAD_REQUEST_ERRORS'] = True
+routes.config['TRAP_BAD_REQUEST_ERRORS'] = True
 
 if __name__ == '__main__':
-    app.run()
+    routes.run()

@@ -4,7 +4,7 @@ import stagger
 import io
 
 # Pobiera odpowiednie metadata z plikow audio
-from ..app.app import db
+from ..app.routes import db
 from ..app import models
 
 
