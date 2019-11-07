@@ -1,9 +1,19 @@
 import io
 import re
 import sqlalchemy
-from flask import render_template, jsonify, send_file, request, json
-from app import app, models, db
-from app.models import Grades
+from flask import render_template, jsonify, send_file, request, json, Flask
+from .models import Grades, Metadata, Song, UserData
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)
+CORS(app, origins=['127.0.0.1:5000'])
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://hechsma2:AWjLUDbZaz2Srh6j@mysql.agh.edu.pl:3306/hechsma2'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://3wvzLcjQzD:RArEPgAhKS@remotemysql.com:3306/3wvzLcjQzD'
+db = SQLAlchemy(app)
+
 
 @app.route('/')
 @app.route('/home')
@@ -14,7 +24,7 @@ def homepage():
 # get the song metadata
 @app.route('/meta/<song_id>')
 def metadata(song_id):
-    meta = models.Metadata.query.get(song_id)
+    meta = Metadata.query.get(song_id)
     genre = re.sub('[\(+(0-9)\)]', '', meta.genre)
     ret = {"title": meta.title,
            "band": meta.band,
@@ -27,7 +37,7 @@ def metadata(song_id):
 #get the song pic
 @app.route('/pic/cover<song_id>.jpg')
 def cover(song_id):
-    pic = models.Song.query.get(song_id)
+    pic = Song.query.get(song_id)
     bytes = io.BytesIO(pic.img)
     filename = "cover"+str(song_id)+".jpg"
 
@@ -76,7 +86,7 @@ def add_grade(user_id, song_id):
 def new_user(user_id):
     try:
         if request.method == 'GET':
-            user = models.UserData.query.get(user_id)
+            user = UserData.query.get(user_id)
             ret = {"id": user.id,
                    "pseudo": user.pseudo,
                    "age": user.age,
@@ -89,7 +99,7 @@ def new_user(user_id):
             pseudo = str(content.get("pseudo"))
             age = int(content.get("age"))
             gen = str(content.get("grade"))
-            user = models.UserData(pseudo=pseudo, age=age, gender=gen)
+            user = UserData(pseudo=pseudo, age=age, gender=gen)
             db.session.add(user)  # so this works :)
             db.session.flush()
             ret = {"user_id": user.id}

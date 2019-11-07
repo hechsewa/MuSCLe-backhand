@@ -2,10 +2,12 @@ import os
 import eyed3
 import stagger
 import io
-from app import app, models, db
-
 
 # Pobiera odpowiednie metadata z plikow audio
+from ..app.app import db
+from ..app import models
+
+
 class Metadata:
     def __init__(self, v_path):
         self.path = v_path
