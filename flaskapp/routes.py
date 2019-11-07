@@ -79,7 +79,6 @@ def add_grade(user_id, song_id):
 
 # add new user
 @app.route('/user/<user_id>', methods=['POST', 'GET'])
-@crossdomain(origin='*')
 def new_user(user_id):
     try:
         if request.method == 'GET':
