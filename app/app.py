@@ -3,11 +3,11 @@ import re
 
 import sqlalchemy
 from flask import render_template, jsonify, send_file, request, json
-from backhand.flaskapp import app, models, db
+from backhand.app import app, models, db
 
 
 # home page
-from backhand.flaskapp.models import Grades
+from backhand.app.models import Grades
 from backhand.src.crossdomain import crossdomain
 
 

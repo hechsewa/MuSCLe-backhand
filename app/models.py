@@ -1,4 +1,4 @@
-from backhand.flaskapp import db
+from backhand.app import db
 
 
 class UserData(db.Model):

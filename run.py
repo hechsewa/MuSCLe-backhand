@@ -1,4 +1,4 @@
-from backhand.flaskapp import app
+from backhand.app import app
 
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 if __name__ == '__main__':

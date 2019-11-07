@@ -11,4 +11,4 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://3wvzLcjQzD:RArEPgAhKS@r
 
 db = SQLAlchemy(app)
 
-from backhand.flaskapp import app
+from backhand.app import app
