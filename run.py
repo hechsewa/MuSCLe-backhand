@@ -1,4 +1,4 @@
-from .app import app
+from .flaskapp import app
 
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 

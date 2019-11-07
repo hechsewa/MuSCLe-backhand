@@ -4,8 +4,8 @@ import stagger
 import io
 
 # Pobiera odpowiednie metadata z plikow audio
-from ..app.app import db
-from ..app import models
+from ..flaskapp.app import db
+from ..flaskapp import models
 
 
 class Metadata:
