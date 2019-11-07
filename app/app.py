@@ -1,14 +1,9 @@
 import io
 import re
-
 import sqlalchemy
 from flask import render_template, jsonify, send_file, request, json
 from app import app, models, db
-
-
-# home page
 from app.models import Grades
-
 
 @app.route('/')
 @app.route('/home')

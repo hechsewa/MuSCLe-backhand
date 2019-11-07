@@ -1,4 +1,4 @@
-from backhand.app import db
+from app import db
 
 
 class UserData(db.Model):
