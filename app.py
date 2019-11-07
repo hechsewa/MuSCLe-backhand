@@ -2,10 +2,10 @@ import io
 import re
 import sqlalchemy
 from flask import render_template, jsonify, send_file, request, json, Flask
-from .models import Grades, Metadata, Song, UserData
+from models import Grades, Metadata, Song, UserData
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from .__init__ import app, db
+from __init__ import app, db
 
 
 @app.route('/')
