@@ -17,7 +17,7 @@ class CollaborativeFilteringRecommender:
 
     def preprocess_data(self):
         if not self.trening_data:
-            return []
+            return pd.DataFrame()
         rows = np.unique([s[0] for s in self.trening_data])
         #rows = np.array(list(range(0,108)))
         #columns = np.unique([s[0] for s in self.trening_data])
@@ -50,12 +50,12 @@ class CollaborativeFilteringRecommender:
 
     # [[user_id, song_id, rating],[].., []]
     def get_user_profile(self):
-        user = [(s[1], s[2]) for s in self.all_grades if s[0] == self.user_id]
+        user = [(s[1], s[2]) for s in self.all_grades if s[0] == int(self.user_id)]
         return user
 
     def get_recommendations(self):
         similar_songs = pd.DataFrame()
-        if not self.item_sim_df:
+        if self.item_sim_df.empty:
             return similar_songs
         for song, rating in self.user_profile:
             similar_songs = similar_songs.append(self.get_similar_song(song, rating), ignore_index=True)
@@ -63,6 +63,8 @@ class CollaborativeFilteringRecommender:
         sim = similar_songs.sum().sort_values(ascending=False)
         bad_df = sim.index.isin(user_songs)
         rec = sim[~bad_df].head(108)
+        if not self.user_profile:
+            return pd.DataFrame()
         rec_val = np.divide(rec.values-rec.values.mean(), rec.values.max()-rec.values.min())
         data = {'song_id': rec.index.values, 'rec': rec_val}
         df = pd.DataFrame(data, columns=['song_id', 'rec'])
