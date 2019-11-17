@@ -1,11 +1,13 @@
 import io
 import re
 import sqlalchemy
-from flask import render_template, jsonify, send_file, request, json, Flask
-from models import Grades, Metadata, Song, UserData
+from flask import render_template, jsonify, send_file, request, json, Flask, url_for
+from sqlalchemy import select
+from models import Grades, Metadata, Song, UserData # przy deploy wziąc ta kropke wywalic
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from __init__ import app, db
+from src.hybrid_recommender import HybridRecommender
 
 
 @app.route('/')
@@ -38,10 +40,39 @@ def cover(song_id):
         bytes,
         mimetype='image/jpeg')
 
-# get the song feature
-@app.route('/feature/<song_id>/<feature_id>')
-def feature(song_id, feature_id):
-    return 0
+# recommend a song
+@app.route('/user/<user_id>/recommend')
+def recommend(user_id):
+    # get all grades like: [[user_id, song_id, grade]]
+    data = Grades.query.with_entities(Grades.user_id, Grades.song_id, Grades.grade).all()
+    df_csv = "static/data.csv"
+    hyb_rec = HybridRecommender(data, df_csv, user_id)
+    hyb_df = hyb_rec.recommended.values.tolist()
+    if hyb_df:
+        hyb_first_id = hyb_df[0][0]
+        return jsonify({'song_id': hyb_first_id})
+    else:
+        return jsonify({'song_id': -1})
+
+# get random song
+@app.route('/user/<user_id>/random')
+def get_random(user_id):
+    # get all users graded songs
+    songs = Grades.query.filter_by(user_id=user_id).with_entities(Grades.song_id).all()
+    all_songs = list(range(1, 108))
+    user_songs = [s[0] for s in songs]
+    remaining = [s for s in all_songs if s not in user_songs]
+    if remaining:
+        return jsonify({'song_id': remaining[0]})
+    else:
+        return jsonify({'song_id': -1})
+
+# get the user grades
+@app.route('/user/<user_id>/grades')
+def grades(user_id):
+    data = Grades.query.filter_by(user_id=user_id).with_entities(Grades.song_id, Grades.grade).all()
+    ret = jsonify(data)
+    return ret
 
 # add new grade or get the grade for user for song
 @app.route('/user/<user_id>/song/<song_id>/grade', methods=['GET', 'POST'])
@@ -61,7 +92,7 @@ def add_grade(user_id, song_id):
             grader = Grades(user_id=userid, song_id=songid, grade=gradval)
             db.session.add(grader)
             db.session.flush()
-            ret = {"grade_id": grader.id};
+            ret = {"grade_id": grader.id}
             db.session.commit()
             return jsonify(ret)
 
