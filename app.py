@@ -74,6 +74,13 @@ def grades(user_id):
     ret = jsonify(data)
     return ret
 
+# get number of songs graded by user
+@app.route('/user/<user_id>/grades/sum')
+def grades_sum(user_id):
+    data = Grades.query.filter_by(user_id=user_id).with_entities(Grades.song_id, Grades.grade).all()
+    ret = {'grade': len(data)}
+    return jsonify(ret)
+
 # add new grade or get the grade for user for song
 @app.route('/user/<user_id>/song/<song_id>/grade', methods=['GET', 'POST'])
 def add_grade(user_id, song_id):
