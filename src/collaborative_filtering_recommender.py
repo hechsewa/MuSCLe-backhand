@@ -21,7 +21,7 @@ class CollaborativeFilteringRecommender:
         rows = np.unique([s[0] for s in self.trening_data])
         #rows = np.array(list(range(0,108)))
         #columns = np.unique([s[0] for s in self.trening_data])
-        columns = np.array(list(range(0,108)))
+        columns = np.array(list(range(1,108)))
         data = np.zeros((rows.size, columns.size))
         #  fill data matrix
         i=0
@@ -40,7 +40,6 @@ class CollaborativeFilteringRecommender:
         ratings_std = df #.apply(self.normalization)
         item_sim = cosine_similarity(ratings_std.T)
         item_sim_df = pd.DataFrame(item_sim, index=ratings_std.columns, columns=ratings_std.columns)
-        #item_sim_df = df.corr(method='kendall')
         return item_sim_df
 
     def get_similar_song(self, song, rating):
@@ -59,10 +58,11 @@ class CollaborativeFilteringRecommender:
             return similar_songs
         for song, rating in self.user_profile:
             similar_songs = similar_songs.append(self.get_similar_song(song, rating), ignore_index=True)
-        user_songs = [i[0] for i in self.user_profile]
+        user_songs = np.unique([i[0] for i in self.user_profile])
         sim = similar_songs.sum().sort_values(ascending=False)
-        bad_df = sim.index.isin(user_songs)
-        rec = sim[~bad_df].head(108)
+        rec = sim.drop(user_songs)
+        print(rec)
+        print(user_songs)
         if not self.user_profile:
             return pd.DataFrame()
         rec_val = np.divide(rec.values-rec.values.mean(), rec.values.max()-rec.values.min())

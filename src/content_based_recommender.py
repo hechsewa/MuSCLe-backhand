@@ -28,7 +28,7 @@ class ContentBasedRecommender:
         #sort reverse and get first 10 items
         sorted_arr = np.sort(weighted_rec)
         sorted_rev = sorted_arr[::-1]
-        rec = sorted_rev[0:108]
+        rec = sorted_rev[1:108]
         indexes = []
         for item in rec:
             ind = np.where(weighted_rec == item)[0][0]
