@@ -50,7 +50,7 @@ def recommend(user_id):
     hyb_df = hyb_rec.recommended.values.tolist()
     if hyb_df:
         hyb_first_id = hyb_df[0][0]
-        return jsonify({'song_id': hyb_df}) #first_id})
+        return jsonify({'song_id': hyb_first_id})
     else:
         return jsonify({'song_id': -1})
 
