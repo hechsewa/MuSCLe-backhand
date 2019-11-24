@@ -38,7 +38,7 @@ class Metadata(db.Model):
 
 class Recommendations(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user_data.id'))
     rec_song_id = db.Column(db.Integer, db.ForeignKey('song.id'))
     rec_score = db.Column(db.Float)
 
