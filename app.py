@@ -3,7 +3,7 @@ import re
 import sqlalchemy
 from flask import render_template, jsonify, send_file, request, json, Flask, url_for
 from sqlalchemy import select
-from models import Grades, Metadata, Song, UserData # przy deploy wziąc ta kropke wywalic
+from models import Grades, Metadata, Song, UserData, Recommendations # przy deploy wziąc ta kropke wywalic
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from __init__ import app, db
@@ -73,6 +73,16 @@ def grades(user_id):
     data = Grades.query.filter_by(user_id=user_id).with_entities(Grades.song_id, Grades.grade).all()
     ret = jsonify(data)
     return ret
+
+# test for recommendations
+@app.route('/test/<id>')
+def test(id):
+    rec = Recommendations(user_id=1, rec_song_id=1, rec_score=id)
+    db.session.add(rec)
+    db.session.flush()
+    ret = {"rec_id": rec.id}
+    db.session.commit()
+    return jsonify(ret)
 
 # get number of songs graded by user
 @app.route('/user/<user_id>/grades/sum')

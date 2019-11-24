@@ -38,6 +38,7 @@ class CollaborativeFilteringRecommender:
 
         df = pd.DataFrame(data=data, index=rows, columns=columns)
         ratings_std = df #.apply(self.normalization)
+        print(ratings_std)
         item_sim = cosine_similarity(ratings_std.T)
         item_sim_df = pd.DataFrame(item_sim, index=ratings_std.columns, columns=ratings_std.columns)
         return item_sim_df
@@ -61,8 +62,6 @@ class CollaborativeFilteringRecommender:
         user_songs = np.unique([i[0] for i in self.user_profile])
         sim = similar_songs.sum().sort_values(ascending=False)
         rec = sim.drop(user_songs)
-        print(rec)
-        print(user_songs)
         if not self.user_profile:
             return pd.DataFrame()
         rec_val = np.divide(rec.values-rec.values.mean(), rec.values.max()-rec.values.min())
@@ -73,7 +72,7 @@ class CollaborativeFilteringRecommender:
 
 def main():
     # data = [[user, song, rating], [user, song, rating], []]
-    cb = CollaborativeFilteringRecommender([[2, 1, 5], [2, 2, 5], [2, 3, 2], [2, 4, 1]], 2)
+    cb = CollaborativeFilteringRecommender([[2, 1, 5], [2, 2, 5], [2, 3, 2], [2, 4, 1], [1,4,2], [1,2,4]], 1)
     print(cb.recommended)
     #cb.get_recommendations()
 
