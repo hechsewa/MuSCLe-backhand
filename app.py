@@ -48,6 +48,12 @@ def recommend(user_id):
     df_csv = "static/data.csv"
     hyb_rec = HybridRecommender(data, df_csv, user_id)
     hyb_df = hyb_rec.recommended.values.tolist()
+    # save the recommendation to recommendations table
+    rec = Recommendations(user_id=user_id, rec_song_id=hyb_df[0][0], rec_score=hyb_df[0][1])
+    db.session.add(rec)
+    db.session.flush()
+    db.session.commit()
+
     if hyb_df:
         hyb_first_id = hyb_df[0][0]
         return jsonify({'song_id': hyb_first_id})
@@ -73,16 +79,6 @@ def grades(user_id):
     data = Grades.query.filter_by(user_id=user_id).with_entities(Grades.song_id, Grades.grade).all()
     ret = jsonify(data)
     return ret
-
-# test for recommendations
-@app.route('/test/<id>')
-def test(id):
-    rec = Recommendations(user_id=1, rec_song_id=1, rec_score=id)
-    db.session.add(rec)
-    db.session.flush()
-    ret = {"rec_id": rec.id}
-    db.session.commit()
-    return jsonify(ret)
 
 # get number of songs graded by user
 @app.route('/user/<user_id>/grades/sum')
