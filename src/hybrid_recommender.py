@@ -1,3 +1,6 @@
+#from src.collaborative_filtering_recommender import CollaborativeFilteringRecommender
+#from src.content_based_recommender import ContentBasedRecommender
+import pandas as pd
 from src.collaborative_filtering_recommender import CollaborativeFilteringRecommender
 from src.content_based_recommender import ContentBasedRecommender
 
@@ -20,6 +23,7 @@ class HybridRecommender:
 
             # Computing a hybrid recommendation score based on CF and CB scores
             recs_df['recHybrid'] = recs_df['recCF'] + recs_df['recCB']
+            recs_df = recs_df.drop_duplicates(subset='song_id')
             recs = recs_df.sort_values('recHybrid', ascending=False).head(10)
             return recs
         else:

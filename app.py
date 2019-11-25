@@ -49,7 +49,7 @@ def recommend(user_id):
     hyb_rec = HybridRecommender(data, df_csv, user_id)
     hyb_df = hyb_rec.recommended.values.tolist()
     # save the recommendation to recommendations table
-    rec = Recommendations(user_id=user_id, rec_song_id=hyb_df[0][0], rec_score=hyb_df[0][1])
+    rec = Recommendations(user_id=user_id, rec_song_id=hyb_df[0][0], rec_score=hyb_df[0][3])
     db.session.add(rec)
     db.session.flush()
     db.session.commit()
@@ -57,6 +57,7 @@ def recommend(user_id):
     if hyb_df:
         hyb_first_id = hyb_df[0][0]
         return jsonify({'song_id': hyb_first_id})
+        #return jsonify(hyb_df)
     else:
         return jsonify({'song_id': -1})
 

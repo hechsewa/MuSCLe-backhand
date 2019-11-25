@@ -1,18 +1,21 @@
 import numpy as np
 import pandas as pd
+from sklearn.metrics.pairwise import linear_kernel
+from sklearn.neighbors import NearestNeighbors
 
 
 class ContentBasedRecommender:
     def __init__(self, all_grades, user_id, path):
-        self.user_grades = [(s[1], s[2]) for s in all_grades if s[0] == user_id]
+        self.user_grades = [(s[1], s[2]) for s in all_grades if s[0] == int(user_id)]
         self.user_songs = [s[0] for s in self.user_grades]
         self.data = self.read_csv(path)
         self.user_profile = self.get_user_profile()
-        self.recommended = self.get_recommendation()
+        self.recommended = self.get_recs()
 
     def get_user_profile(self):
         feature_matrix = self.data.loc[self.data['nr'].isin(self.user_songs)]
-        user_grades = [s[1] for s in self.user_grades]
+        unique_grades = list(set(self.user_grades))
+        user_grades = [s[1] for s in unique_grades]
         m = np.delete(np.array(feature_matrix), 0, 1)
         c = np.array(user_grades)
         weighted_matrix = m * c[:, np.newaxis]
@@ -20,23 +23,24 @@ class ContentBasedRecommender:
         user_profile_norm = user_profile/np.sum(user_profile)
         return user_profile_norm
 
-    def get_recommendation(self):
-        black_box = self.data.loc[~self.data['nr'].isin(self.user_songs)]
-        m = np.delete(np.array(black_box), 0, 1)
-        weighted_rec = np.sum(m, 1)
-        amax = np.amax(weighted_rec)
-        #sort reverse and get first 10 items
-        sorted_arr = np.sort(weighted_rec)
-        sorted_rev = sorted_arr[::-1]
-        rec = sorted_rev[1:108]
-        indexes = []
-        for item in rec:
-            ind = np.where(weighted_rec == item)[0][0]
-            indexes.append(ind)
-        rec_std = np.divide(rec-rec.mean(), rec.max()-rec.min())
-        data = {'song_id': indexes, 'rec': rec_std}
-        df = pd.DataFrame(data)
-        return df
+    def get_recs(self):
+        knn = NearestNeighbors(10, p=2)
+        knn.fit(self.data)
+        user_data = self.data.loc[self.data['nr'].isin(self.user_songs)]
+        if user_data.empty:
+            return pd.DataFrame([], columns=['song_id', 'rec'])
+        nn = knn.kneighbors(user_data, return_distance=True)
+        result_matrix = []
+        dists = nn[0].flatten()
+        songs = nn[1].flatten()
+        for i in range(0, dists.size):
+            result_matrix.append([songs[i], dists[i]])
+        df = pd.DataFrame(result_matrix, columns=['song_id', 'rec'])
+        df_sorted = df.sort_values(by=['rec'])
+        df_nonzero = df_sorted.loc[df['rec'] != 0]
+        df_nonzero['rec'] = (df_nonzero['rec'].mean()-df_nonzero['rec']) / (df_nonzero['rec'].max() - df_nonzero['rec'].min())
+        new_df = pd.DataFrame(df_nonzero.values, columns=['song_id', 'rec'])
+        return new_df
 
     def read_csv(self, path):
         df = pd.read_csv(path)
@@ -45,7 +49,10 @@ class ContentBasedRecommender:
 
 
 def main():
-    cb = ContentBasedRecommender([[1,4,3],[1,2,4],[2,3,2], [1,3,2]], 1, './data.csv')
+    cb = ContentBasedRecommender([[1,1,3],[1,2,4],[1,3,2],[1,4,4],[1,5,2],[1,6,3],[1,7,5],[1,8,3],[1,9,4],[1,10,4],
+                                  [1,11,3],[1,12,4],[1,13,3],[1,14,4],[1,15,2],[1,16,2],[1,17,4],[1,18,1],
+                                  [1,19,2],[1,20,2],[1,21,3],[1,22,4],[1,23,4],[1,24,3],
+                                  [1,25,4],[1,26,4],[1,27,4],[1,28,2]], 1, './data.csv')
     print(cb.recommended)
 
 
