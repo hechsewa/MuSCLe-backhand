@@ -10,6 +10,7 @@ class HybridRecommender:
     def __init__(self, all_grades, path, user_id):
         self.cf_rec = CollaborativeFilteringRecommender(all_grades, user_id)
         self.cb_rec = ContentBasedRecommender(all_grades, user_id, path)
+        self.user_songs = [s[1] for s in all_grades if s[0] == int(user_id)]
         self.recommended = self.recommend()
 
     def recommend(self):
@@ -22,9 +23,11 @@ class HybridRecommender:
                                   left_on='song_id',
                                   right_on='song_id')
             recs_df = recs_df.fillna(0)
+            print(recs_df)
             # Computing a hybrid recommendation score based on CF and CB scores
             recs_df['recHybrid'] = recs_df['recCF'] + recs_df['recCB']
             recs_df = recs_df.drop_duplicates(subset='song_id')
+            recs_df = recs_df.loc[~recs_df['song_id'].isin(self.user_songs)]
             scaler = MinMaxScaler()
             recs_df['recHybrid'] = scaler.fit_transform(recs_df['recHybrid'].values.reshape(-1, 1))
             recs = recs_df.sort_values('recHybrid', ascending=False).head(10)

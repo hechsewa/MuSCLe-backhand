@@ -45,7 +45,7 @@ def cover(song_id):
 def recommend(user_id):
     # get all grades like: [[user_id, song_id, grade]]
     data = Grades.query.with_entities(Grades.user_id, Grades.song_id, Grades.grade).all()
-    df_csv = "static/data_norm.csv"
+    df_csv = "static/data.csv"
     hyb_rec = HybridRecommender(data, df_csv, user_id)
     hyb_df = hyb_rec.recommended.values.tolist()
     # save the recommendation to recommendations table
@@ -115,7 +115,7 @@ def add_grade(user_id, song_id):
             userid = content.get("user_id")
             songid = content.get("song_id")
             gradval = content.get("grade")
-            exsists = Grades.query.filter_by(user_id=user_id, song_id=song_id).all()
+            exsists = Grades.query.filter_by(user_id=userid, song_id=songid).all()
             if not exsists:
                 grader = Grades(user_id=userid, song_id=songid, grade=gradval)
                 db.session.add(grader)

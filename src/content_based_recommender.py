@@ -8,9 +8,9 @@ from sklearn.preprocessing import MinMaxScaler
 class ContentBasedRecommender:
     def __init__(self, all_grades, user_id, path):
         self.user_grades = [(s[1], s[2]) for s in all_grades if s[0] == int(user_id)]
-        self.user_songs = [s[0] for s in self.user_grades]
+        self.user_songs = [s[0]-1 for s in self.user_grades]
         self.data = self.read_csv(path)
-        self.user_profile = self.get_user_profile()
+        #self.user_profile = self.get_user_profile()
         self.recommended = self.get_recs()
 
     def get_user_profile(self):
@@ -26,16 +26,19 @@ class ContentBasedRecommender:
         return user_profile_norm
 
     def get_recs(self):
-        knn = NearestNeighbors(12, p=2)
-        knn.fit(self.data)
+        knn = NearestNeighbors(100, p=2)
         user_songs_5 = [s[0] for s in self.user_grades if s[1] == 5]
         if not user_songs_5:
             like_songs = [s[0] for s in self.user_grades if s[1] == 4]
         else:
             like_songs = user_songs_5
         user_data = self.data.loc[self.data['nr'].isin(like_songs)]
+        all_data = self.data.loc[~self.data['nr'].isin(like_songs)]
+        all_data = all_data.drop(columns='nr').fillna(0.0)
+        user_data = user_data.drop(columns='nr').fillna(0.0)
         if user_data.empty:
             return pd.DataFrame([], columns=['song_id', 'rec'])
+        knn.fit(all_data)
         nn = knn.kneighbors(user_data, return_distance=True)
         result_matrix = []
         dists = nn[0].flatten()
@@ -43,8 +46,9 @@ class ContentBasedRecommender:
         for i in range(0, dists.size):
             result_matrix.append([songs[i], dists[i]])
         df = pd.DataFrame(result_matrix, columns=['song_id', 'rec'])
-        #df_sorted = df.sort_values(by=['rec'])
         df_nonzero = df.loc[df['rec'] != 0]
+        df_nonzero = df_nonzero.loc[~df_nonzero['song_id'].isin(self.user_songs)]
+        df_nonzero = df_nonzero.drop_duplicates(subset=['song_id'])
         df_nonzero['rec'] = df_nonzero['rec']*(-1)  # reverse
         scaler = MinMaxScaler()
         df_nonzero['rec'] = scaler.fit_transform(df_nonzero['rec'].values.reshape(-1, 1))
