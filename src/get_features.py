@@ -2,10 +2,36 @@ import csv
 import librosa  # https://librosa.github.io/
 import math     # do zaokraglania wartosci
 import numpy
+import pandas as pd
+import sklearn
 from pydub import AudioSegment  # konwersja do wav
 import scipy
 from scipy import signal
 import os
+
+
+def normalize(csv_data):
+    csv_end = ['bpm', 'spec flat', 'spec skew', 'kurt', 'zero cross', 'hpss', 'vocal',
+                 'bin1', 'bin2', 'bin3', 'bin4', 'bin5', 'bin6',
+                 'bin1 mean freq', 'bin1 std', 'bin1 q25', 'bin1 q75',
+                 'bin2 mean freq', 'bin2 std', 'bin2 q25', 'bin2 q75',
+                 'bin3 mean freq', 'bin3 std', 'bin3 q25', 'bin3 q75',
+                 'bin4 mean freq', 'bin4 std', 'bin4 q25', 'bin4 q75',
+                 'bin5 mean freq', 'bin5 std', 'bin5 q25', 'bin5 q75',
+                 'bin6 mean freq', 'bin6 std', 'bin6 q25', 'bin6 q75']
+    csv_end_2 = [['bpm', 'spec flat', 'spec skew', 'kurt', 'zero cross', 'hpss', 'vocal',
+                 'bin1', 'bin2', 'bin3', 'bin4', 'bin5', 'bin6',
+                 'bin1 mean freq', 'bin1 std', 'bin1 q25', 'bin1 q75',
+                 'bin2 mean freq', 'bin2 std', 'bin2 q25', 'bin2 q75',
+                 'bin3 mean freq', 'bin3 std', 'bin3 q25', 'bin3 q75',
+                 'bin4 mean freq', 'bin4 std', 'bin4 q25', 'bin4 q75',
+                 'bin5 mean freq', 'bin5 std', 'bin5 q25', 'bin5 q75',
+                 'bin6 mean freq', 'bin6 std', 'bin6 q25', 'bin6 q75', 'nr']]
+    normal = sklearn.preprocessing.normalize(csv_data, norm='l2', axis=1, copy=True, return_norm=False)
+    df = pd.DataFrame(normal, columns=csv_end)
+    df['nr'] = numpy.arange(108)
+    csv_end = numpy.concatenate((csv_end_2, df.values))
+    return csv_end
 
 
 class FeatureSet:
@@ -29,29 +55,41 @@ class FeatureSet:
 
     # mean frequency (kHz) for a bin of frequencies
     def get_mean_freq(self, bin_freq):
+        # bin_freq = numpy.nanmean(bin_freq)
         mean = numpy.mean(bin_freq)
+        if math.isnan(mean):
+            mean = 0
         return mean
 
     # standard derivation bin of frequencies
     def get_standard_dev(self, bin_freq):
+        # bin_freq = numpy.nanmean(bin_freq)
         sd = numpy.sqrt(numpy.mean(abs(bin_freq - numpy.mean(bin_freq)) ** 2))
+        if math.isnan(sd):
+            sd = 0
         return sd
 
     # 1 kwantyl/mediana dla bin of frequencies
     def get_q25(self, bin_freq):
+        # bin_freq = numpy.nanmean(bin_freq)
         try:
             q25 = numpy.quantile(bin_freq, 0.25)
-            return q25
         except IndexError:
-            return numpy.nan
+            q25 = 0
+        if math.isnan(q25):
+            q25 = 0
+        return q25
 
     # 3 kantyl dla bin of freq
     def get_q75(self, bin_freq):
+        # bin_freq = numpy.nanmean(bin_freq)
         try:
             q75 = numpy.quantile(bin_freq, 0.75)
-            return q75
         except IndexError:
-            return numpy.nan
+            q75 = 0
+        if math.isnan(q75):
+            q75 = 0
+        return q75
 
     # how noise-like a sound is, as opposed to being tone-like (closer to 1 - white noise)
     def get_spectral_flatness(self):
@@ -73,7 +111,6 @@ class FeatureSet:
     def get_kurtosis(self):
         kurt = scipy.stats.kurtosis(self.wave)
         return kurt
-        #return numpy.mean(kurt)
 
     def get_zero_crossings(self):
         zero_crossings = librosa.zero_crossings(self.wave, pad=False)
@@ -137,7 +174,8 @@ class FeatureSet:
         _, _, spectrogram = signal.spectrogram(self.wave, self.sample_rate)
         bin_size = numpy.max(spectrogram)/6
         spectrogram = spectrogram.flatten()
-        bin_scale = [x for x in spectrogram if (x>((no-1)*bin_size) and x<=(no*bin_size))]
+        bin_scale = [x for x in spectrogram if (x>((no-1)*bin_size) and x<=((no)*bin_size))]
+        #print(bin_scale)
         return bin_scale
 
 
@@ -237,7 +275,16 @@ def main():
     csv_file.close()
 
 
+def main_norm():
+    df = pd.read_csv("data.csv")
+    norm = normalize(df.iloc[:, 1:].values)
+    with open('data_norm.csv', 'w') as csv_file:
+        wr = csv.writer(csv_file)
+        wr.writerows(norm)
+    csv_file.close()
+
+
 if __name__ == '__main__':
-    main()
+    main_norm()
 
 

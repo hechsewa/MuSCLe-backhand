@@ -45,19 +45,26 @@ def cover(song_id):
 def recommend(user_id):
     # get all grades like: [[user_id, song_id, grade]]
     data = Grades.query.with_entities(Grades.user_id, Grades.song_id, Grades.grade).all()
-    df_csv = "static/data.csv"
+    df_csv = "static/data_norm.csv"
     hyb_rec = HybridRecommender(data, df_csv, user_id)
     hyb_df = hyb_rec.recommended.values.tolist()
     # save the recommendation to recommendations table
-    rec = Recommendations(user_id=user_id, rec_song_id=hyb_df[0][0], rec_score=hyb_df[0][3])
-    db.session.add(rec)
-    db.session.flush()
-    db.session.commit()
+    counter = len([x for x in data if x[0] == int(user_id)])
+    if counter == 30:  # przy 30 ocenie zapisz rekomendacje
+        for s in hyb_df:
+            rec = Recommendations(user_id=user_id, rec_song_id=s[0], rec_score=s[1])
+            db.session.add(rec)
+        db.session.flush()
+        db.session.commit()
 
-    if hyb_df:
-        hyb_first_id = hyb_df[0][0]
-        return jsonify({'song_id': hyb_first_id})
-        #return jsonify(hyb_df)
+    recs = Recommendations.query\
+        .filter_by(user_id=user_id) \
+        .order_by(Recommendations.rec_score.desc()) \
+        .with_entities(Recommendations.rec_song_id)\
+        .all()
+
+    if recs and counter>=30:
+        return jsonify({'song_id': recs[counter-30][0]})
     else:
         return jsonify({'song_id': -1})
 

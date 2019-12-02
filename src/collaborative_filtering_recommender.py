@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import MinMaxScaler
 
 
 class CollaborativeFilteringRecommender:
@@ -19,8 +20,6 @@ class CollaborativeFilteringRecommender:
         if not self.trening_data:
             return pd.DataFrame()
         rows = np.unique([s[0] for s in self.trening_data])
-        #rows = np.array(list(range(0,108)))
-        #columns = np.unique([s[0] for s in self.trening_data])
         columns = np.array(list(range(1,108)))
         data = np.zeros((rows.size, columns.size))
         #  fill data matrix
@@ -37,8 +36,7 @@ class CollaborativeFilteringRecommender:
             i += 1
 
         df = pd.DataFrame(data=data, index=rows, columns=columns)
-        ratings_std = df #.apply(self.normalization)
-        print(ratings_std)
+        ratings_std = df
         item_sim = cosine_similarity(ratings_std.T)
         item_sim_df = pd.DataFrame(item_sim, index=ratings_std.columns, columns=ratings_std.columns)
         return item_sim_df
@@ -64,18 +62,22 @@ class CollaborativeFilteringRecommender:
         rec = sim.drop(user_songs)
         if not self.user_profile:
             return pd.DataFrame()
-        rec_val = np.divide(rec.values-rec.values.mean(), rec.values.max()-rec.values.min())
-        data = {'song_id': rec.index.values, 'rec': rec_val}
+        data = {'song_id': rec.index.values, 'rec': rec.values}
         df = pd.DataFrame(data, columns=['song_id', 'rec'])
+        scaler = MinMaxScaler()
+        df['rec'] = scaler.fit_transform(df['rec'].values.reshape(-1, 1))
         return df
 
 
 def main():
-    # data = [[user, song, rating], [user, song, rating], []]
-    cb = CollaborativeFilteringRecommender([[2, 1, 5], [2, 2, 5], [2, 3, 2], [2, 4, 1], [1,4,2], [1,2,4]], 1)
+    cb = CollaborativeFilteringRecommender([[2, 1, 5], [2, 2, 5], [2, 3, 2], [2, 4, 1], [2,5,2],[1,1,3],[1,2,4],[1,3,2],[1,4,4],[1,5,2],[1,6,3],[1,7,5],[1,8,3],[1,9,4],[1,10,4],
+                                  [1,11,3],[1,12,4],[1,13,3],[1,14,4],[1,15,2],[1,16,2],[1,17,4],[1,18,1],
+                                  [1,19,2],[1,20,2],[1,21,3],[1,22,4],[1,23,4],[1,24,3],
+                                  [1,25,4],[1,26,4],[1,27,4],[1,28,2], [3,1,5],[3,2,4],[3,3,2],[3,4,4],[3,5,2],[3,6,3],[3,7,5],[3,8,3],[3,9,4],[3,10,4],
+                                  [3,11,1],[3,12,3],[3,13,3],[3,14,5],[3,15,4],[3,16,2],[3,17,4],[3,18,1],
+                                  [3,19,1],[3,20,3],[3,21,3],[3,22,4],[3,23,4],[3,24,3],
+                                  [3,25,1],[3,26,4],[3,27,4],[3,28,2]], 2)
     print(cb.recommended)
-    #cb.get_recommendations()
-
 
 if __name__ == '__main__':
     main()
