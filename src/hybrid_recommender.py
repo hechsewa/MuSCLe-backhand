@@ -17,19 +17,19 @@ class HybridRecommender:
         cf_df = self.cf_rec.recommended.rename(columns={'rec': 'recCF'})
         cb_df = self.cb_rec.recommended.rename(columns={'rec': 'recCB'})
         if not cf_df.empty:
-            recs_df = cb_df.merge(cf_df,
-                                  how='inner',
+            recs_df = cf_df.merge(cb_df,
+                                  how='outer',
                                   left_on='song_id',
                                   right_on='song_id')
-
+            recs_df = recs_df.fillna(0)
             # Computing a hybrid recommendation score based on CF and CB scores
             recs_df['recHybrid'] = recs_df['recCF'] + recs_df['recCB']
             recs_df = recs_df.drop_duplicates(subset='song_id')
-            print(recs_df)
             scaler = MinMaxScaler()
             recs_df['recHybrid'] = scaler.fit_transform(recs_df['recHybrid'].values.reshape(-1, 1))
             recs = recs_df.sort_values('recHybrid', ascending=False).head(10)
             new = recs[['song_id', 'recHybrid']].copy()
+            print(new)
             return new
         else:
             return cb_df.rename(columns={'recCB': 'recHybrid'})

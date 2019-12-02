@@ -15,9 +15,10 @@ class ContentBasedRecommender:
 
     def get_user_profile(self):
         feature_matrix = self.data.loc[self.data['nr'].isin(self.user_songs)]
+        feature_matrix = feature_matrix.drop(columns='nr')
         unique_grades = list(set(self.user_grades))
         user_grades = [s[1] for s in unique_grades]
-        m = np.delete(np.array(feature_matrix), 0, 1)
+        m = np.array(feature_matrix)
         c = np.array(user_grades)
         weighted_matrix = m * c[:, np.newaxis]
         user_profile = np.sum(weighted_matrix, 0)
@@ -52,7 +53,6 @@ class ContentBasedRecommender:
 
     def read_csv(self, path):
         df = pd.read_csv(path)
-        df = df[['nr', 'bpm', 'spec flat', 'spec skew', 'kurt', 'zero cross', 'hpss', 'vocal']]
         return df
 
 
