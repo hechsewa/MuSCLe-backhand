@@ -50,14 +50,15 @@ def recommend(user_id):
     hyb_df = hyb_rec.recommended.values.tolist()
     # save the recommendation to recommendations table
     counter = len([x for x in data if x[0] == int(user_id)])
-    print(counter)
     recs = Recommendations.query \
         .filter_by(user_id=user_id) \
         .order_by(Recommendations.rec_score.desc()) \
         .with_entities(Recommendations.rec_song_id) \
         .all()
+    print(counter)
     if counter == 30 and not recs:  # przy 30 ocenie zapisz rekomendacje
         for s in hyb_df:
+            print("saving recs to db")
             rec = Recommendations(user_id=user_id, rec_song_id=s[0], rec_score=s[1])
             db.session.add(rec)
             db.session.flush()
@@ -68,8 +69,9 @@ def recommend(user_id):
             .with_entities(Recommendations.rec_song_id) \
             .all()
 
+    print(recs)
     if recs and counter >= 30:
-        return jsonify({'song_id': recs[counter-30][0]})
+        return jsonify({'song_id': recs[counter-31][0]})
     else:
         return jsonify({'song_id': -1})
 
@@ -115,7 +117,9 @@ def add_grade(user_id, song_id):
             userid = content.get("user_id")
             songid = content.get("song_id")
             gradval = content.get("grade")
-            exsists = Grades.query.filter_by(user_id=userid, song_id=songid).all()
+            exsists = Grades.query\
+                      .filter_by(user_id=userid)\
+                      .filter_by(song_id=songid).all()
             if not exsists:
                 grader = Grades(user_id=userid, song_id=songid, grade=gradval)
                 db.session.add(grader)

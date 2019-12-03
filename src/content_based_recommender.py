@@ -26,7 +26,7 @@ class ContentBasedRecommender:
         return user_profile_norm
 
     def get_recs(self):
-        knn = NearestNeighbors(100, p=2)
+        knn = NearestNeighbors(80, p=2)
         user_songs_5 = [s[0] for s in self.user_grades if s[1] == 5]
         if not user_songs_5:
             like_songs = [s[0] for s in self.user_grades if s[1] == 4]
