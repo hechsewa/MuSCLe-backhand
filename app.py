@@ -2,11 +2,8 @@ import io
 import re
 import sqlalchemy
 from flask import render_template, jsonify, send_file, request, json, Flask, url_for
-from sqlalchemy import select
-from models import Grades, Metadata, Song, UserData, Recommendations # przy deploy wziąc ta kropke wywalic
-from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
-from __init__ import app, db
+from backhand.models import Grades, Metadata, Song, UserData, Recommendations # przy deploy wziąc ta kropke wywalic
+from backhand.__init__ import app, db
 from src.hybrid_recommender import HybridRecommender
 
 
@@ -122,20 +119,20 @@ def add_grade(user_id, song_id):
 
         if request.method == 'POST':
             content = request.get_json(force=True)
-            userid = content.get("user_id")
-            songid = content.get("song_id")
-            gradval = content.get("grade")
+            userid = int(content.get("user_id"))
+            songid = int(content.get("song_id"))
+            gradval = int(content.get("grade"))
             exsists = Grades.query\
                       .filter_by(user_id=userid)\
                       .filter_by(song_id=songid).all()
             if not exsists:
-                grader = Grades(user_id=userid, song_id=songid, grade=gradval)
+                grader = Grades(grade=gradval, user_id=userid, song_id=songid)
                 db.session.add(grader)
                 db.session.flush()
                 ret = {"grade_id": grader.id}
+                print(ret)
                 db.session.commit()
                 return jsonify(ret)
-
         ret = {'status': 'ok'}
         return jsonify(ret)
 
