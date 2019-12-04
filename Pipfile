@@ -16,6 +16,7 @@ pymysql = "*"
 gunicorn = "*"
 ffmpeg = "*"
 pandas = "*"
+psycopg2 = "*"
 
 [dev-packages]
 
