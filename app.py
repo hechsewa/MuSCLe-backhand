@@ -16,6 +16,12 @@ def homepage():
     return render_template('home.html')
 
 
+@app.route('/finish')
+def finish():
+    db.session.close()
+    db.dispose()
+    return jsonify({"status": "ok"})
+
 # get the song metadata
 @app.route('/meta/<song_id>')
 def metadata(song_id):
@@ -33,6 +39,8 @@ def metadata(song_id):
 @app.route('/pic/cover<song_id>.jpg')
 def cover(song_id):
     pic = Song.query.get(song_id)
+    if not pic:
+        return jsonify({"status": "ok"})
     bytes = io.BytesIO(pic.img)
     filename = "cover"+str(song_id)+".jpg"
 

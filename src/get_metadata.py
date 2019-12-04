@@ -4,9 +4,10 @@ import stagger
 import io
 
 # Pobiera odpowiednie metadata z plikow audio
-from backhand.app import db
-from backhand import models
+from flask_sqlalchemy import SQLAlchemy
 
+from backhand import models
+from backhand.__init__ import db
 
 class Metadata:
     def __init__(self, v_path):
@@ -53,6 +54,7 @@ def main():
             title = metadata.get_title()
             genre = metadata.get_genre()
             cover = metadata.get_cover()
+            print("song"+str(nr)+": "+str(cover))
             # save to db
             song = models.Song(src=serverpath, img=cover)
             meta = models.Metadata(title=title, band=artist, genre=genre, album=album)

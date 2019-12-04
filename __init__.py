@@ -9,7 +9,7 @@ app = Flask(__name__, static_folder='static', static_url_path='/static')
 CORS(app)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://hechsma2:AWjLUDbZaz2Srh6j@mysql.agh.edu.pl:3306/hechsma2'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://siogaomlorkjzp:bf59ed280c5de6981e2bad8078f123a4400687968f1d24ceebbf6d1c13335a17@ec2-46-137-120-243.eu-west-1.compute.amazonaws.com:5432/ddbumffp5cq5ki'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://3wvzLcjQzD:RArEPgAhKS@remotemysql.com:3306/3wvzLcjQzD'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 db = SQLAlchemy(app)

@@ -4,19 +4,21 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-flask = "*"
+Flask = "*"
 numpy = "*"
 scipy = "*"
-eyed3 = "*"
+eyeD3 = "*"
 stagger = "*"
 sklearn = "*"
-flask-cors = "*"
-flask-sqlalchemy = "*"
-pymysql = "*"
+Flask-Cors = "*"
+Flask-SQLAlchemy = "*"
+PyMySQL = "*"
 gunicorn = "*"
 ffmpeg = "*"
 pandas = "*"
 psycopg2 = "*"
+libmagic = "*"
+python-magic-bin = "*"
 
 [dev-packages]
 
