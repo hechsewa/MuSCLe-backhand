@@ -2,8 +2,8 @@ import io
 import re
 import sqlalchemy
 from flask import render_template, jsonify, send_file, request, json, Flask, url_for
-from backhand.models import Grades, Metadata, Song, UserData, Recommendations # przy deploy wziąc ta kropke wywalic
-from backhand.__init__ import app, db
+from models import Grades, Metadata, Song, UserData, Recommendations # przy deploy wziąc ta kropke wywalic
+from __init__ import app, db
 from src.hybrid_recommender import HybridRecommender
 
 
