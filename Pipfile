@@ -18,7 +18,6 @@ ffmpeg = "*"
 pandas = "*"
 psycopg2 = "*"
 libmagic = "*"
-python-magic-bin = "*"
 
 [dev-packages]
 
