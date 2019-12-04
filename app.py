@@ -160,7 +160,6 @@ def new_user(user_id):
             ret = {"user_id": user.id}
             db.session.commit()
             return jsonify(ret)
-
         else:
             ret = {'status': 'ok'}
             return jsonify(ret)
